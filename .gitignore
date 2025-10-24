@@ -29,3 +29,17 @@ data/coswara/annotations/
 
 # Logs
 *.log
+
+# Ignore datasets
+data/
+*.wav
+*.tar.gz
+*.zip
+*.mp3
+*.pkl
+*.npz
+
+# Ignore cache and env
+__pycache__/
+*.pyc
+.env
