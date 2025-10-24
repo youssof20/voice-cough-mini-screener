@@ -242,15 +242,36 @@ def main():
                 if risk_score < 30:
                     analysis_level = "Low Variation"
                     analysis_color = "green"
+                    interpretation = "Very stable audio pattern - smooth, consistent sound"
                 elif risk_score < 70:
                     analysis_level = "Moderate Variation" 
                     analysis_color = "orange"
+                    interpretation = "Some variation in audio characteristics - mixed patterns"
                 else:
                     analysis_level = "High Variation"
                     analysis_color = "red"
+                    interpretation = "Highly variable audio pattern - irregular, complex sound"
                 
                 st.markdown(f"**Analysis Level:** <span style='color: {analysis_color}'>{analysis_level}</span>", unsafe_allow_html=True)
                 st.markdown(f"**Score:** {risk_score:.1f}/100")
+                st.markdown(f"**What this means:** {interpretation}")
+                
+                # Add explanation for normal users
+                with st.expander("What does this score mean?"):
+                    st.markdown("""
+                    **This score measures audio irregularity patterns:**
+                    
+                    - **Low (0-30)**: Very smooth, consistent audio - like steady humming or calm breathing
+                    - **Moderate (30-70)**: Some variation - like normal speech with occasional changes
+                    - **High (70-100)**: Highly irregular - like coughs, gasps, or very unstable voice
+                    
+                    **Why this matters:**
+                    - Coughs typically show high irregularity (sudden bursts, complex patterns)
+                    - Breathing shows moderate irregularity (rhythmic but varying intensity)
+                    - Voice shows low-moderate irregularity (relatively stable pitch and energy)
+                    
+                    **Remember:** This is for demonstration only - not medical diagnosis!
+                    """)
             
             with col2:
                 st.header("📈 Audio Visualizations")
