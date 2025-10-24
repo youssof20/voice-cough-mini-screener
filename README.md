@@ -38,6 +38,11 @@ A web application that analyzes voice and cough audio files using digital signal
 
 3. **Open your browser** to `http://localhost:8501`
 
+   DEMO:
+
+   ![Demo](https://github.com/user-attachments/assets/cafa7f59-8e09-4b0f-adbb-c743b69d8c25)
+
+
 ## Usage
 
 1. **Upload an audio file** using the sidebar (WAV, MP3, M4A supported)
