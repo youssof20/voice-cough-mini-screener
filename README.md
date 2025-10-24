@@ -100,6 +100,22 @@ The application uses real audio samples from the **Coswara dataset**:
 - **Format**: WAV files with clinical annotations
 - **Usage**: Educational and research purposes only
 
+### Getting the Dataset
+
+To use the full dataset (optional):
+
+1. **Download Coswara dataset**:
+   - Visit: https://coswara.iisc.ac.in/
+   - Download the 20220224 dataset files
+   - Extract to `data/coswara/20220224/`
+
+2. **Process the dataset** (optional):
+   ```bash
+   python utils/data_integration.py
+   ```
+
+**Note**: The app works with the included processed samples (67 files) without needing the full dataset.
+
 ## License
 
 This project is for **educational use only**.
