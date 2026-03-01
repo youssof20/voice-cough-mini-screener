@@ -52,7 +52,8 @@ COVID-positive subjects across cough, breathing, and vowel tasks.
 
 ## Status
 
-Functional for feature extraction and visualization. 
-Classification layer in progress.
+Functional for feature extraction and visualization. Includes a **simple
+rule-based audio-type suggestion** (Cough / Voice / Breathing) as a first step
+toward the classification layer.
 
 *Not a diagnostic tool. For research and learning only.*

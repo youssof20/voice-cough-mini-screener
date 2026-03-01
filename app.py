@@ -26,14 +26,15 @@ import os
 import tempfile
 
 # Import our custom modules
-from utils.audio_features import extract_all_features, calculate_risk_score, load_audio
+from utils.audio_features import extract_all_features, calculate_risk_score, load_audio, suggest_audio_type
 from utils.visualizations import (
-    create_waveform_plot, 
-    create_spectrogram_plot, 
+    create_waveform_plot,
+    create_spectrogram_plot,
     create_pitch_curve_plot,
     create_combined_plot,
-    fig_to_base64
+    create_feature_summary_plot,
 )
+from utils.data_integration import get_processed_samples
 
 
 def main():
@@ -120,20 +121,8 @@ def main():
         st.header("🎵 Real Audio Samples")
         st.write("Try these real audio samples from the Coswara dataset:")
         
-        # Get real data samples
-        real_samples = {}
-        if os.path.exists("data/processed"):
-            processed_files = [f for f in os.listdir("data/processed") if f.endswith('.wav')]
-            # Show first 10 real samples with descriptive names
-            for i, file in enumerate(processed_files[:10]):
-                # Extract type from filename
-                if 'cough' in file:
-                    sample_type = "Cough"
-                elif 'breathing' in file:
-                    sample_type = "Breathing"
-                else:
-                    sample_type = "Voice"
-                real_samples[f"{sample_type} Sample {i+1}"] = f"data/processed/{file}"
+        # Get real data samples (uses metadata when available for all samples)
+        real_samples = get_processed_samples("data/processed")
         
         if not real_samples:
             st.warning("No real audio samples found. Please run the data processing script first.")
@@ -185,6 +174,7 @@ def main():
             with st.spinner("Analyzing audio features..."):
                 features_df, feature_descriptions = extract_all_features(file_path)
                 risk_score = calculate_risk_score(features_df)
+                suggested_type = suggest_audio_type(features_df)
             
             # Load audio for visualization
             audio, sr = load_audio(file_path)
@@ -255,6 +245,10 @@ def main():
                 st.markdown(f"**Analysis Level:** <span style='color: {analysis_color}'>{analysis_level}</span>", unsafe_allow_html=True)
                 st.markdown(f"**Score:** {risk_score:.1f}/100")
                 st.markdown(f"**What this means:** {interpretation}")
+
+                # Audio type suggestion (classification layer - demonstrative)
+                if suggested_type:
+                    st.markdown(f"**Suggested audio type:** *{suggested_type}* (feature-based, for demo only)")
                 
                 # Add explanation for normal users
                 with st.expander("What does this score mean?"):
@@ -277,26 +271,36 @@ def main():
                 st.header("📈 Audio Visualizations")
                 
                 # Create tabs for different visualizations
-                tab1, tab2, tab3 = st.tabs(["Combined View", "Waveform", "Spectrogram"])
-                
+                tab1, tab2, tab3, tab4 = st.tabs(["Combined View", "Waveform", "Spectrogram", "Pitch Contour"])
+
                 with tab1:
                     # Combined plot
                     fig_combined = create_combined_plot(audio, sr, f"Analysis: {file_name}")
                     st.pyplot(fig_combined)
-                
+
                 with tab2:
                     # Waveform only
                     fig_wave = create_waveform_plot(audio, sr, f"Waveform: {file_name}")
                     st.pyplot(fig_wave)
-                
+
                 with tab3:
                     # Spectrogram only
                     fig_spec = create_spectrogram_plot(audio, sr, f"Spectrogram: {file_name}")
                     st.pyplot(fig_spec)
+
+                with tab4:
+                    # Pitch contour (matches README: pitch contour output)
+                    fig_pitch = create_pitch_curve_plot(audio, sr, f"Pitch Contour: {file_name}")
+                    st.pyplot(fig_pitch)
             
             # Feature explanations
             st.header("🔬 Feature Explanations")
-            
+
+            # Feature summary bar chart (key metrics at a glance)
+            features_dict = features_df.iloc[0].to_dict()
+            fig_summary = create_feature_summary_plot(features_dict, f"Key features: {file_name}")
+            st.pyplot(fig_summary)
+
             col1, col2, col3 = st.columns(3)
             
             with col1:

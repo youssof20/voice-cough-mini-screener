@@ -158,15 +158,15 @@ def extract_spectral_features(audio: np.ndarray, sr: int) -> Dict[str, float]:
     }
 
 
-def extract_all_features(file_path: str) -> pd.DataFrame:
+def extract_all_features(file_path: str) -> Tuple[pd.DataFrame, Dict[str, str]]:
     """
     Extract all acoustic features from an audio file.
-    
+
     Args:
         file_path: Path to audio file
-    
+
     Returns:
-        Pandas DataFrame with extracted features
+        Tuple of (feature DataFrame, feature_descriptions dict)
     """
     # Load audio
     audio, sr = load_audio(file_path)
@@ -287,3 +287,46 @@ def calculate_risk_score(features: pd.DataFrame) -> float:
     
     # Ensure score is between 0-100
     return min(max(analysis_score, 0), 100)
+
+
+def suggest_audio_type(features: pd.DataFrame) -> Optional[str]:
+    """
+    Suggest the most likely audio type (cough / voice / breathing) from features.
+    Demonstrative only — part of the "classification layer in progress".
+    Uses simple rule-based heuristics on acoustic features.
+
+    Args:
+        features: DataFrame with extracted features (one row)
+
+    Returns:
+        Human-readable suggestion e.g. "Cough", "Voice", "Breathing", or None
+    """
+    if features is None or features.empty:
+        return None
+    row = features.iloc[0]
+    zcr = row.get("zero_crossing_rate", 0)
+    jitter = row.get("jitter_approx", 0)
+    shimmer = row.get("shimmer_approx", 0)
+    mean_pitch = row.get("mean_pitch", 0)
+    pitch_std = row.get("pitch_std", 0)
+    spectral_centroid = row.get("spectral_centroid", 0)
+    rms_energy = row.get("rms_energy", 0)
+
+    # Cough: often high ZCR, high shimmer/jitter, short bursts → high irregularity
+    cough_score = (zcr * 15 + min(shimmer / 15, 1) + min(jitter / 5, 1)) / 3
+    # Voice: clear pitch, moderate stability, moderate centroid
+    voice_score = 0
+    if mean_pitch > 50 and pitch_std < 80:
+        voice_score = (1 - min(jitter / 10, 1)) * (1 - min(shimmer / 20, 1))
+    # Breathing: often low pitch energy, higher ZCR, low spectral centroid
+    breath_score = (min(zcr * 12, 1) + (1 if spectral_centroid < 1500 else 0.3) + (0.5 if rms_energy < 0.05 else 0)) / 2.5
+
+    scores = [
+        ("Cough", cough_score),
+        ("Voice", voice_score),
+        ("Breathing", breath_score),
+    ]
+    scores.sort(key=lambda x: -x[1])
+    if scores[0][1] > 0.2:
+        return scores[0][0]
+    return None

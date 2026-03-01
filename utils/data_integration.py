@@ -148,13 +148,14 @@ def process_coswara_dataset(coswara_path: str, output_path: str, max_files: int 
             if duration < 0.5 or duration > 10:
                 continue
             
-            # Determine file type from path
+            # Determine file type from path (Coswara naming: cough-heavy, breathing-deep, vowel-a, etc.)
             file_type = 'unknown'
-            if 'cough' in file_path.lower():
+            path_lower = file_path.lower().replace('\\', '/')
+            if 'cough' in path_lower:
                 file_type = 'cough'
-            elif 'breath' in file_path.lower():
+            elif 'breath' in path_lower:
                 file_type = 'breathing'
-            elif 'voice' in file_path.lower() or 'speech' in file_path.lower():
+            elif 'vowel' in path_lower or 'voice' in path_lower or 'speech' in path_lower or 'counting' in path_lower:
                 file_type = 'voice'
             
             # Create processed filename
@@ -191,28 +192,86 @@ def process_coswara_dataset(coswara_path: str, output_path: str, max_files: int 
     return metadata_df
 
 
+def get_processed_samples(processed_dir: str = "data/processed") -> Dict[str, str]:
+    """
+    Get real audio samples for the app. Uses metadata.csv when available
+    for descriptive labels; otherwise falls back to directory listing.
+    
+    Returns:
+        Dict mapping display label -> file path
+    """
+    samples = {}
+    metadata_path = os.path.join(processed_dir, "metadata.csv")
+    
+    if os.path.exists(metadata_path):
+        try:
+            df = pd.read_csv(metadata_path)
+            for _, row in df.iterrows():
+                fname = row.get("filename", "")
+                if not fname.endswith(".wav"):
+                    continue
+                path = os.path.join(processed_dir, fname)
+                if not os.path.exists(path):
+                    continue
+                # Descriptive label: type and duration
+                atype = str(row.get("type", "audio")).replace("_", " ").title()
+                dur = row.get("duration", 0)
+                if isinstance(dur, (int, float)):
+                    label = f"{atype} ({dur:.1f}s)"
+                else:
+                    label = atype
+                # Keep unique labels
+                base = label
+                c = 1
+                while label in samples:
+                    label = f"{base} #{c}"
+                    c += 1
+                samples[label] = path
+            return samples
+        except Exception:
+            pass
+    
+    # Fallback: list wav files
+    if os.path.exists(processed_dir):
+        for f in os.listdir(processed_dir):
+            if f.endswith(".wav"):
+                path = os.path.join(processed_dir, f)
+                if "cough" in f:
+                    stype = "Cough"
+                elif "breathing" in f or "breath" in f:
+                    stype = "Breathing"
+                elif "vowel" in f or "voice" in f:
+                    stype = "Voice"
+                else:
+                    stype = "Sample"
+                label = f"{stype} {len(samples) + 1}"
+                samples[label] = path
+    
+    return samples
+
+
 def create_sample_selection(processed_path: str) -> List[str]:
     """
     Create a curated selection of the best samples for demo.
-    
+
     Args:
         processed_path: Path to processed files
-    
+
     Returns:
         List of selected filenames
     """
     metadata_file = os.path.join(processed_path, 'metadata.csv')
-    
+
     if not os.path.exists(metadata_file):
         print("No metadata file found. Run dataset processing first.")
         return []
-    
+
     # Load metadata
     df = pd.read_csv(metadata_file)
-    
+
     # Select diverse samples
     selected_samples = []
-    
+
     # Get samples by type
     for file_type in ['cough', 'voice', 'breathing']:
         type_samples = df[df['type'] == file_type]
@@ -221,13 +280,13 @@ def create_sample_selection(processed_path: str) -> List[str]:
             median_duration = type_samples['duration'].median()
             closest_sample = type_samples.iloc[(type_samples['duration'] - median_duration).abs().argsort()[:1]]
             selected_samples.append(closest_sample['filename'].iloc[0])
-    
+
     # Add a few more random samples
     remaining_samples = df[~df['filename'].isin(selected_samples)]
     if len(remaining_samples) > 0:
         random_samples = remaining_samples.sample(min(3, len(remaining_samples)))
         selected_samples.extend(random_samples['filename'].tolist())
-    
+
     print(f"Selected {len(selected_samples)} samples for demo")
     return selected_samples
 
