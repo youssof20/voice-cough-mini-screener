@@ -1,5 +1,7 @@
 # Voice & Cough Mini-Screener
 
+<img width="981" height="863" alt="image" src="https://github.com/user-attachments/assets/b111b533-b426-4b2c-915f-cefbd392f504" />
+
 Acoustic analysis tool that extracts clinical signal features from voice 
 and cough recordings to identify irregularity patterns associated with 
 respiratory conditions.
