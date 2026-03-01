@@ -1,13 +1,13 @@
 # Voice & Cough Mini-Screener
 
-<img width="981" height="863" alt="image" src="https://github.com/user-attachments/assets/b111b533-b426-4b2c-915f-cefbd392f504" />
-
 Acoustic analysis tool that extracts clinical signal features from voice 
 and cough recordings to identify irregularity patterns associated with 
 respiratory conditions.
 
 Built on real audio from the Coswara dataset — actual cough, breathing, 
 and sustained vowel recordings collected during COVID-19 research at IISc Bangalore.
+
+<img width="981" height="863" alt="image" src="https://github.com/user-attachments/assets/b111b533-b426-4b2c-915f-cefbd392f504" />
 
 ---
 
