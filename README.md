@@ -1,151 +1,58 @@
 # Voice & Cough Mini-Screener
 
-A web application that analyzes voice and cough audio files using digital signal processing techniques to extract acoustic features and visualize audio characteristics.
+Acoustic analysis tool that extracts clinical signal features from voice 
+and cough recordings to identify irregularity patterns associated with 
+respiratory conditions.
 
-## Important Disclaimer
-
-**This application is for EDUCATIONAL and DEMONSTRATION purposes only.**
-
-- This is NOT a medical device and should NOT be used for diagnostic purposes
-- The analysis scores are purely demonstrative and have no clinical validity
-- Always consult healthcare professionals for medical concerns
-
-## Features
-
-- **Real Audio Analysis**: Extracts acoustic features from actual audio files
-- **Feature Extraction**: Pitch, energy, spectral characteristics, voice stability metrics
-- **Visualizations**: Waveforms, spectrograms, and pitch contours
-- **Real Data**: Uses actual audio samples from the Coswara medical dataset
-- **Interactive Interface**: Clean web interface built with Streamlit
-
-## Quick Start
-
-### Prerequisites
-- Python 3.8 or higher
-- pip package manager
-
-### Installation
-
-1. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Run the application**:
-   ```bash
-   streamlit run app.py
-   ```
-
-3. **Open your browser** to `http://localhost:8501`
-
-   DEMO:
-
-   ![Demo](https://github.com/user-attachments/assets/cafa7f59-8e09-4b0f-adbb-c743b69d8c25)
-
-
-## Usage
-
-1. **Upload an audio file** using the sidebar (WAV, MP3, M4A supported)
-2. **Try real samples** - actual audio from the Coswara medical dataset
-3. **View results** - acoustic features, visualizations, and analysis scores
-4. **Explore features** - detailed explanations of each acoustic metric
-
-## Technical Details
-
-### Extracted Features
-- **Duration**: Audio length in seconds
-- **Mean Pitch (F0)**: Fundamental frequency tracking
-- **RMS Energy**: Amplitude/loudness over time
-- **Spectral Centroid**: Frequency content analysis
-- **Zero Crossing Rate**: Voice vs noise indicator
-- **Jitter/Shimmer**: Voice stability approximations
-
-### Analysis Score
-The analysis score (0-100) measures audio irregularity patterns:
-- **Low (0-30)**: Very stable audio - smooth, consistent sound
-- **Moderate (30-70)**: Some variation - normal speech patterns
-- **High (70-100)**: Highly irregular - coughs, complex patterns
-
-### Implementation
-- **Audio Processing**: librosa for feature extraction
-- **Visualization**: matplotlib for scientific plots
-- **Web Interface**: Streamlit for interactive display
-- **Data Source**: Coswara dataset (real medical audio)
-
-## Project Structure
-
-```
-voice_cough_app/
-├── app.py                    # Main Streamlit application
-├── requirements.txt          # Python dependencies
-├── README.md                 # This documentation
-├── utils/
-│   ├── audio_features.py     # Feature extraction algorithms
-│   ├── visualizations.py     # Plotting functions
-│   └── data_integration.py   # Dataset processing
-└── data/
-    ├── coswara/              # Original Coswara dataset
-    └── processed/            # Processed audio samples
-```
-
-## Educational Value
-
-This project demonstrates:
-- Digital signal processing fundamentals
-- Audio feature extraction techniques
-- Biomedical signal analysis
-- Web application development
-- Real-world data processing
-
-## Dataset Information
-
-The application uses real audio samples from the **Coswara dataset**:
-- **Source**: https://coswara.iisc.ac.in/
-- **Content**: Real cough, breathing, and voice recordings
-- **Format**: WAV files with clinical annotations
-- **Usage**: Educational and research purposes only
-
-### Getting the Dataset
-
-To use the full dataset (optional):
-
-1. **Download Coswara dataset**:
-   - Visit: https://coswara.iisc.ac.in/
-   - Download the 20220224 dataset files
-   - Extract to `data/coswara/20220224/`
-
-2. **Process the dataset** (optional):
-   ```bash
-   python utils/data_integration.py
-   ```
-
-**Note**: The app works with the included processed samples (67 files) without needing the full dataset.
-
-## License
-
-This project is for **educational use only**.
-- Study, modify, and learn from the code
-- Use for academic research projects
-- Incorporate into educational materials
-- No commercial or medical use
-- No medical diagnosis or treatment
-
-## Contributing
-
-Contributions are welcome for:
-- Feature improvements and new algorithms
-- Visualization enhancements
-- Documentation improvements
-- Bug fixes and compatibility
-
-## Support
-
-For questions about this educational project:
-- Check the code comments and documentation
-- Review the feature explanations in the app
-- Consult academic literature for research applications
-- Always consult healthcare professionals for medical questions
+Built on real audio from the Coswara dataset — actual cough, breathing, 
+and sustained vowel recordings collected during COVID-19 research at IISc Bangalore.
 
 ---
 
-**Remember: This tool demonstrates audio signal processing capabilities, not medical diagnosis. Always consult healthcare professionals for medical concerns.**
+## What it actually does
+
+Takes a WAV/MP3 file and extracts the features clinicians care about:
+
+- **Jitter & Shimmer** — cycle-to-cycle pitch and amplitude instability
+- **Spectral Centroid** — where the energy sits in the frequency spectrum
+- **Zero Crossing Rate** — separates voiced sound from turbulent airflow
+- **Pitch tracking (F0)** — fundamental frequency contour over time
+
+Outputs a waveform, spectrogram, pitch contour, and an irregularity 
+score that reflects how far the sample deviates from stable phonation.
+
+---
+
+## Quick start
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+Upload any audio file or use the included Coswara samples to explore.
+
+---
+
+## Dataset
+
+Uses real recordings from the 
+[Coswara dataset](https://coswara.iisc.ac.in/) — 
+a clinical audio collection from IISc Bangalore with healthy and 
+COVID-positive subjects across cough, breathing, and vowel tasks.
+
+67 processed samples included. Full dataset available at the link above.
+
+---
+
+## Stack
+
+`librosa` · `streamlit` · `matplotlib`
+
+---
+
+## Status
+
+Functional for feature extraction and visualization. 
+Classification layer in progress.
+
+*Not a diagnostic tool. For research and learning only.*
